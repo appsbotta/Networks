@@ -1,0 +1,13 @@
+exec_prefix="/usr/local/bin"
+libdir="/usr/local/lib"
+includedir="/usr/local/include"
+
+Name: ns3-psc
+Description: 
+URL: 
+Version: 3.dev
+Requires:  ns3-core ns3-energy ns3-mobility ns3-network ns3-antenna ns3-buildings ns3-lte ns3-point-to-point ns3-sip
+Requires.private: 
+Cflags: -I"${includedir}"  -I/usr/include/python3.10 -I/usr/include
+Libs: -L"${libdir}" -lns3-dev-psc-debug  -lns3-dev-core-debug -lns3-dev-energy-debug -lns3-dev-mobility-debug -lns3-dev-network-debug -lns3-dev-antenna-debug -lns3-dev-buildings-debug -lns3-dev-lte-debug -lns3-dev-point-to-point-debug -lns3-dev-sip-debug
+Libs.private: -L"${libdir}" 
