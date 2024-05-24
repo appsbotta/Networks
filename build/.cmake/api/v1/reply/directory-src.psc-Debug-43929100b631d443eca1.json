@@ -1,0 +1,143 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"install",
+			"build_lib"
+		],
+		"files" : 
+		[
+			"build-support/custom-modules/ns3-module-macros.cmake",
+			"src/psc/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 1
+			},
+			{
+				"command" : 1,
+				"file" : 1,
+				"line" : 221,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 459,
+				"parent" : 1
+			}
+		]
+	},
+	"installers" : 
+	[
+		{
+			"backtrace" : 2,
+			"component" : "Unspecified",
+			"destination" : "lib",
+			"paths" : 
+			[
+				"lib/libns3-dev-psc-debug.so"
+			],
+			"targetId" : "libpsc::@6c253ff25e824178b046",
+			"targetIndex" : 168,
+			"type" : "target"
+		},
+		{
+			"backtrace" : 2,
+			"component" : "Unspecified",
+			"destination" : "include/ns3",
+			"paths" : 
+			[
+				"src/psc/helper/ims-helper.h",
+				"src/psc/helper/intel-http-helper.h",
+				"src/psc/helper/mcptt-call-helper.h",
+				"src/psc/helper/mcptt-helper.h",
+				"src/psc/helper/mcptt-msg-stats.h",
+				"src/psc/helper/mcptt-server-helper.h",
+				"src/psc/helper/mcptt-state-machine-stats.h",
+				"src/psc/helper/mcptt-trace-helper.h",
+				"src/psc/helper/psc-application-helper.h",
+				"src/psc/helper/psc-scenario-trace-helper.h",
+				"src/psc/helper/uav-mobility-energy-model-helper.h",
+				"src/psc/helper/udp-group-echo-helper.h",
+				"src/psc/model/intel-http-client.h",
+				"src/psc/model/intel-http-header.h",
+				"src/psc/model/intel-http-server.h",
+				"src/psc/model/mcptt-call.h",
+				"src/psc/model/mcptt-call-machine.h",
+				"src/psc/model/mcptt-call-machine-grp-basic.h",
+				"src/psc/model/mcptt-call-machine-grp-basic-state.h",
+				"src/psc/model/mcptt-call-machine-grp-broadcast.h",
+				"src/psc/model/mcptt-call-machine-grp-broadcast-state.h",
+				"src/psc/model/mcptt-call-machine-private.h",
+				"src/psc/model/mcptt-call-machine-private-state.h",
+				"src/psc/model/mcptt-call-msg.h",
+				"src/psc/model/mcptt-call-msg-field.h",
+				"src/psc/model/mcptt-call-type-machine.h",
+				"src/psc/model/mcptt-call-type-machine-grp-basic.h",
+				"src/psc/model/mcptt-call-type-machine-private.h",
+				"src/psc/model/mcptt-call-type-machine-private-state.h",
+				"src/psc/model/mcptt-channel.h",
+				"src/psc/model/mcptt-counter.h",
+				"src/psc/model/mcptt-emerg-alert-machine.h",
+				"src/psc/model/mcptt-emerg-alert-machine-basic.h",
+				"src/psc/model/mcptt-entity-id.h",
+				"src/psc/model/mcptt-floor-msg.h",
+				"src/psc/model/mcptt-floor-msg-field.h",
+				"src/psc/model/mcptt-floor-msg-sink.h",
+				"src/psc/model/mcptt-floor-participant.h",
+				"src/psc/model/mcptt-floor-queue.h",
+				"src/psc/model/mcptt-media-msg.h",
+				"src/psc/model/mcptt-media-sink.h",
+				"src/psc/model/mcptt-media-src.h",
+				"src/psc/model/mcptt-msg.h",
+				"src/psc/model/mcptt-off-network-floor-participant.h",
+				"src/psc/model/mcptt-off-network-floor-participant-state.h",
+				"src/psc/model/mcptt-on-network-call-machine-client.h",
+				"src/psc/model/mcptt-on-network-call-machine-client-state.h",
+				"src/psc/model/mcptt-on-network-floor-arbitrator.h",
+				"src/psc/model/mcptt-on-network-floor-arbitrator-state.h",
+				"src/psc/model/mcptt-on-network-floor-dual-control.h",
+				"src/psc/model/mcptt-on-network-floor-dual-control-state.h",
+				"src/psc/model/mcptt-on-network-floor-participant.h",
+				"src/psc/model/mcptt-on-network-floor-participant-state.h",
+				"src/psc/model/mcptt-on-network-floor-towards-participant.h",
+				"src/psc/model/mcptt-on-network-floor-towards-participant-state.h",
+				"src/psc/model/mcptt-ptt-app.h",
+				"src/psc/model/mcptt-pusher.h",
+				"src/psc/model/mcptt-pusher-orchestrator.h",
+				"src/psc/model/mcptt-pusher-orchestrator-contention.h",
+				"src/psc/model/mcptt-pusher-orchestrator-interface.h",
+				"src/psc/model/mcptt-pusher-orchestrator-session-cdf.h",
+				"src/psc/model/mcptt-pusher-orchestrator-spurt-cdf.h",
+				"src/psc/model/mcptt-queued-user-info.h",
+				"src/psc/model/mcptt-rtp-header.h",
+				"src/psc/model/mcptt-sdp-fmtp-header.h",
+				"src/psc/model/mcptt-server-app.h",
+				"src/psc/model/mcptt-server-call.h",
+				"src/psc/model/mcptt-server-call-machine.h",
+				"src/psc/model/mcptt-server-call-machine-group-prearranged.h",
+				"src/psc/model/mcptt-server-call-machine-group-prearranged-state.h",
+				"src/psc/model/mcptt-timer.h",
+				"src/psc/model/psc-application.h",
+				"src/psc/model/psc-application-client.h",
+				"src/psc/model/psc-application-configuration.h",
+				"src/psc/model/psc-application-server.h",
+				"src/psc/model/psc-scenario-definition.h",
+				"src/psc/model/psc-video-streaming.h",
+				"src/psc/model/psc-video-streaming-distributions.h",
+				"src/psc/model/uav-mobility-energy-model.h",
+				"src/psc/model/udp-group-echo-server.h",
+				"build/include/ns3/psc-module.h"
+			],
+			"type" : "file"
+		}
+	],
+	"paths" : 
+	{
+		"build" : "src/psc",
+		"source" : "src/psc"
+	}
+}
