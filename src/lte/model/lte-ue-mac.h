@@ -168,14 +168,17 @@ public:
    * \return pointer to the discovery transmission pool
    */
   Ptr<SidelinkTxDiscResourcePool> GetDiscTxPool ();
-  Ptr<SidelinkTxCommResourcePool> GetslTxpool();
-  /**
-   * \brief Get RBG size
-   *
-   * \param dlbandwidth dDL bandwidth
-   * \returns the RBG size
-   */
-  int GetRbgSize (int slbandwidth);
+
+  //Lokesh
+  
+  // Ptr<SidelinkTxCommResourcePool> GetslTxpool();
+  // /**
+  //  * \brief Get RBG size
+  //  *
+  //  * \param dlbandwidth dDL bandwidth
+  //  * \returns the RBG size
+  //  */
+  // int GetRbgSize (int slbandwidth);
 
 private:
   // forwarded from MAC SAP
