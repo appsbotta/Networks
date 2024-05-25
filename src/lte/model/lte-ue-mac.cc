@@ -49,12 +49,14 @@ namespace ns3 {
 
 NS_LOG_COMPONENT_DEFINE ("LteUeMac");
 
-static const int PfType0AllocationRbg[4] = {//Lokesh pre defined table for type 0 allocation
-  10,       // RGB size 1
-  26,       // RGB size 2
-  63,       // RGB size 3
-  110       // RGB size 4
-};  // see table 7.1.6.1-1 of 36.213
+//Change 1
+
+// static const int PfType0AllocationRbg[4] = {//Lokesh pre defined table for type 0 allocation
+//   10,       // RGB size 1
+//   26,       // RGB size 2
+//   63,       // RGB size 3
+//   110       // RGB size 4
+// };  // see table 7.1.6.1-1 of 36.213
 
 
 NS_OBJECT_ENSURE_REGISTERED (LteUeMac);
@@ -393,13 +395,14 @@ LteUeMac::GetTypeId (void)
                    MakeUintegerChecker<uint8_t> ())
     .AddAttribute ("SlScheduler",
                    "Algorithm for assigning resources for sidelink",
-                   EnumValue (LteUeMac::PF),
+                   EnumValue (LteUeMac::RANDOM),
                    MakeEnumAccessor (&LteUeMac::m_schedulingGrantMetric),
                    MakeEnumChecker (LteUeMac::FIXED, "Fixed",
                                     LteUeMac::RANDOM, "Random",
                                     LteUeMac::MIN_PRB, "MinPrb",
-                                    LteUeMac::MAX_COVERAGE, "MaxCoverage",
-                                    LteUeMac::PF,"ProportionalityFair"))
+                                    LteUeMac::MAX_COVERAGE, "MaxCoverage"
+                                    // ,LteUeMac::PF,"ProportionalityFair" //change 2
+                                    ))
     .AddTraceSource ("SlPscchScheduling",
                      "Information regarding SL UE scheduling",
                      MakeTraceSourceAccessor (&LteUeMac::m_slPscchScheduling),
@@ -439,7 +442,7 @@ LteUeMac::LteUeMac ()
   m_hasSlMibToTx (false),
   m_hasSlCommToTx (false),
   m_hasSlCommToRx (false),
-  m_schedulingGrantMetric (LteUeMac::SlSchedulingGrantMetric::PF)
+  m_schedulingGrantMetric (LteUeMac::SlSchedulingGrantMetric::RANDOM)
 {
   NS_LOG_FUNCTION (this);
   m_miUlHarqProcessesPacket.resize (HARQ_PERIOD);
@@ -496,19 +499,20 @@ LteUeMac::SetLteUePhySapProvider (LteUePhySapProvider* s)
 {
   m_uePhySapProvider = s;
 }
-int
-LteUeMac::GetRbgSize (int slbandwidth)//Lokesh this is a function to get RBG size from bandwidth
-{
-  for (int i = 0; i < 4; i++)
-    {
-      if (slbandwidth < PfType0AllocationRbg[i])//useing pre defined table we are calculating the rbgsize
-        {
-          return (i + 1);
-        }
-    }
 
-  return (-1);
-}
+// int
+// LteUeMac::GetRbgSize (int slbandwidth)//Lokesh this is a function to get RBG size from bandwidth
+// {
+//   for (int i = 0; i < 4; i++)
+//     {
+//       if (slbandwidth < PfType0AllocationRbg[i])//useing pre defined table we are calculating the rbgsize
+//         {
+//           return (i + 1);
+//         }
+//     }
+
+//   return (-1);
+// }
 
 LteMacSapProvider*
 LteUeMac::GetLteMacSapProvider (void)
@@ -2387,7 +2391,7 @@ LteUeMac::GetSlUeSelectedGrant (std::list<PoolInfo>::iterator poolIt)
           std::list <std::pair <uint8_t, std::vector <LteAmc::McsPrbInfo> > > kMcsPrbPairList;//list to check MCPRB pairs that are suitable for tbs
           bool noAvailablePairForTbs = true;
           uint32_t tbs_bytes;
-          std::vector<uint32_t> tbbytes;
+          // std::vector<uint32_t> tbbytes; //lokesh
           uint8_t kValue;
           for (uint8_t i = 0; i < tbPerKtrpVector.size (); i++)
             {
@@ -2396,7 +2400,7 @@ LteUeMac::GetSlUeSelectedGrant (std::list<PoolInfo>::iterator poolIt)
                   //Compute TBS considering RLC overhead
                   tbs_bytes = (uint32_t) std::ceil (GetQueueSize (grant.m_dst) * 1.0 / tbPerKtrpVector[i]) + 2;             //RLC overhead = 2
                   tbs_bytes = std::max ((uint32_t)8, tbs_bytes); //need at least 7 bytes for RLC
-                  tbbytes.push_back(tbs_bytes);
+                  //tbbytes.push_back(tbs_bytes); //lokesh
                   kValue = (uint8_t) std::pow (2, double(i));
                   NS_LOG_DEBUG ("k: " << (uint16_t) kValue << ", TBnumber: " << tbPerKtrpVector[i] << ", TBS: " << tbs_bytes);
                   std::pair <uint8_t, std::vector <LteAmc::McsPrbInfo> > ktrpMcsPrbInfoPair (kValue, m_amc->GetUlMcsNprbInfoFromTbs (tbs_bytes * 8,poolIt->m_pool->GetPsschBandwidth (), 20));
@@ -2411,10 +2415,12 @@ LteUeMac::GetSlUeSelectedGrant (std::list<PoolInfo>::iterator poolIt)
                     }
                 }
             }
+            //Lokesh
             //for(auto it:tbbytes){
             //  std::cout << it <<" ";
             //}
             //std::cout<<std::endl;
+          
           //Check if no <MCS,PRB> pair can support TBS
           if (noAvailablePairForTbs)
             {
@@ -2472,19 +2478,23 @@ LteUeMac::GetSlUeSelectedGrant (std::list<PoolInfo>::iterator poolIt)
                   NS_LOG_INFO ("PSSCH RANDOM grant scheduling");
                   //Compute the total number of (MCS,PRBs) pairs
                   totalMcsPrbPairs = 0; //Reset
-                  for (itPair = kMcsPrbPairList.begin (); itPair != kMcsPrbPairList.end (); itPair++){
-                  int ktrps = static_cast<uint32_t>((*itPair).first);
-                  NS_LOG_DEBUG ("Ktrp = " << ktrps);
-                    int n = (*itPair).second.size();
-                    for(int i=0;i<n;i++){
-                    int MCS = static_cast<uint32_t>((*itPair).second[i].mcs);
-                    int prbs = static_cast<uint32_t>((*itPair).second[i].nbRb);
-                    int tbs = static_cast<uint32_t>((*itPair).second[i].tbs);
-                    NS_LOG_DEBUG ("MCS : " <<MCS );
-                    NS_LOG_DEBUG ("NO of PRBs : " << prbs);
-                    NS_LOG_DEBUG ("TBS : " << tbs);
-                    }
-                  }
+
+                  //Lokesh
+
+                  // for (itPair = kMcsPrbPairList.begin (); itPair != kMcsPrbPairList.end (); itPair++){
+                  // int ktrps = static_cast<uint32_t>((*itPair).first);
+                  // NS_LOG_DEBUG ("Ktrp = " << ktrps);
+                  //   int n = (*itPair).second.size();
+                  //   for(int i=0;i<n;i++){
+                  //   int MCS = static_cast<uint32_t>((*itPair).second[i].mcs);
+                  //   int prbs = static_cast<uint32_t>((*itPair).second[i].nbRb);
+                  //   int tbs = static_cast<uint32_t>((*itPair).second[i].tbs);
+                  //   NS_LOG_DEBUG ("MCS : " <<MCS );
+                  //   NS_LOG_DEBUG ("NO of PRBs : " << prbs);
+                  //   NS_LOG_DEBUG ("TBS : " << tbs);
+                  //   }
+                  // }
+
                   for (itPair = kMcsPrbPairList.begin (); itPair != kMcsPrbPairList.end (); itPair++)
                     {
                       totalMcsPrbPairs += (*itPair).second.size ();
@@ -2519,66 +2529,66 @@ LteUeMac::GetSlUeSelectedGrant (std::list<PoolInfo>::iterator poolIt)
                   NS_LOG_DEBUG ("kPairIndex= " << kPairIndex << ", <MCS, PRBs>= <" << (uint16_t)grant.m_mcs << ", " << (uint16_t)grant.m_rbLen << ">, TBS= " << grant.m_tbSize);
 
                   break;
-                case LteUeMac::SlSchedulingGrantMetric::PF://Lokesh
-                {
-                  NS_LOG_INFO("Proportionality Fair-PF");
-                  std::list <std::pair <uint8_t, std::vector <LteAmc::McsPrbInfo> > >::iterator itPairMax = kMcsPrbPairList.end();//pointer to the find ktrp which has max TBS;
-                  std::vector<LteAmc::McsPrbInfo>::iterator it1Max;//pointer to McsPrb vector which has max TBS
-                  int rbgNum = GetRbgSize(poolIt->m_pool->GetPsschBandwidth());//function to get rbg size from bandwidth
-                  //std::cout<< "Bandwidth" << static_cast<uint32_t>(poolIt->m_pool->GetPsschBandwidth()) << std::endl;
-                  int32_t tempTbs = tbs_bytes;// to check TBS greater than or equal to the pre calculated tbs;
-                  for(int i=0;i<rbgNum;i++){// iteration over every rbg
-                    double rcqiMax = 0.0;//variable for max metricS
-                    // Assuming that the RBG is free for allocating for UE
-                    for(itPair = kMcsPrbPairList.begin(); itPair != kMcsPrbPairList.end(); itPair++){// iterating over every Ktrp but its should be every UE
-                      double achievableRate = 0.0;// Variable for calculating the rate
-                      for(auto it1 = (*itPair).second.begin();it1 != (*itPair).second.end();it1++){//iterating over McsPrbinfo vector
-                        if((*it1).tbs >= tempTbs){
-                          tempTbs = (*it1).tbs;
-                          it1Max = it1;
-                        }
-                      }
-                      achievableRate += ((tempTbs / 8) / 0.001); // achievable rate calculation
-                      double rcqi = achievableRate / (1);//divide by prev avg throughput (metric)
-                      if(rcqi > rcqiMax){//checking for max metrioc
-                        rcqiMax = rcqi;
-                        itPairMax = itPair;
-                      }
-                    }
-                    //Granting grant
-                    slKtrp = (*itPairMax).first;
-                    grant.m_mcs = (*it1Max).mcs;
-                    grant.m_tbSize = (*it1Max).tbs;
-                    grant.m_rbLen = (*it1Max).nbRb;
-                  }
-                  ///////////////////////////////////////////////////////////////////////////////////////
-                  uint8_t Cqi = std::rand()%15;
-                  uint8_t mcs = m_amc->GetMcsFromCqi(Cqi);
-                  int PRB = 20;
-                  //int TBS = m_amc->GetDlTbSizeFromMcs(mcs,PRB);
-                  //std::cout<<"mcs: " << (uint16_t)mcs << " Prb: " << (uint16_t)PRB << " Tbs: " << TBS <<std::endl;
-                  std::cout << "Random Cqi: " << (uint16_t)Cqi << std::endl;
-                  for(auto it=tbbytes.begin();it!=tbbytes.end();it++){
-                    PRB = m_amc->GetPrbFromMcsTbs(mcs,(*it)*8);
-                    std::cout << "Cqi-Mcs: " << (uint16_t)mcs << " Cqi-PRB: " << (uint16_t)PRB << " Cqi-TBS: " << (*it)*8 << std::endl;
-                  }
-                  double sinr = -2.0 + static_cast <float> (std::rand()) / ( static_cast <float> (RAND_MAX/(20.0-(-2.0))));
-                  std::cout << "SINR: " <<sinr<<std::endl;
-                  DoubleValue ber;
-                  m_amc->GetAttribute("Ber",ber);
-                  double ber_ = ber.Get();
-                  double s = log2 ( 1 + ( sinr / ( (-std::log (5.0 * (ber_))) / 1.5) ));
-                  int CqiSinr = m_amc->GetCqiFromSpectralEfficiency(s);
-                  std::cout << "CqiSinr: " << CqiSinr <<std::endl;
-                  mcs = m_amc->GetMcsFromCqi(CqiSinr);
-                  for(auto it=tbbytes.begin();it!=tbbytes.end();it++){
-                    PRB = m_amc->GetPrbFromMcsTbs(mcs,(*it)*8);
-                    std::cout << "Sinr-Mcs: " << (uint16_t)mcs << " Sinr-PRB: " << (uint16_t)PRB << " Sinr-TBS: " << (*it)*8 << std::endl;
-                  }
+                // case LteUeMac::SlSchedulingGrantMetric::PF://Lokesh
+                // {
+                //   NS_LOG_INFO("Proportionality Fair-PF");
+                //   std::list <std::pair <uint8_t, std::vector <LteAmc::McsPrbInfo> > >::iterator itPairMax = kMcsPrbPairList.end();//pointer to the find ktrp which has max TBS;
+                //   std::vector<LteAmc::McsPrbInfo>::iterator it1Max;//pointer to McsPrb vector which has max TBS
+                //   int rbgNum = GetRbgSize(poolIt->m_pool->GetPsschBandwidth());//function to get rbg size from bandwidth
+                //   //std::cout<< "Bandwidth" << static_cast<uint32_t>(poolIt->m_pool->GetPsschBandwidth()) << std::endl;
+                //   int32_t tempTbs = tbs_bytes;// to check TBS greater than or equal to the pre calculated tbs;
+                //   for(int i=0;i<rbgNum;i++){// iteration over every rbg
+                //     double rcqiMax = 0.0;//variable for max metricS
+                //     // Assuming that the RBG is free for allocating for UE
+                //     for(itPair = kMcsPrbPairList.begin(); itPair != kMcsPrbPairList.end(); itPair++){// iterating over every Ktrp but its should be every UE
+                //       double achievableRate = 0.0;// Variable for calculating the rate
+                //       for(auto it1 = (*itPair).second.begin();it1 != (*itPair).second.end();it1++){//iterating over McsPrbinfo vector
+                //         if((*it1).tbs >= tempTbs){
+                //           tempTbs = (*it1).tbs;
+                //           it1Max = it1;
+                //         }
+                //       }
+                //       achievableRate += ((tempTbs / 8) / 0.001); // achievable rate calculation
+                //       double rcqi = achievableRate / (1);//divide by prev avg throughput (metric)
+                //       if(rcqi > rcqiMax){//checking for max metrioc
+                //         rcqiMax = rcqi;
+                //         itPairMax = itPair;
+                //       }
+                //     }
+                //     //Granting grant
+                //     slKtrp = (*itPairMax).first;
+                //     grant.m_mcs = (*it1Max).mcs;
+                //     grant.m_tbSize = (*it1Max).tbs;
+                //     grant.m_rbLen = (*it1Max).nbRb;
+                //   }
+                //   ///////////////////////////////////////////////////////////////////////////////////////
+                //   uint8_t Cqi = std::rand()%15;
+                //   uint8_t mcs = m_amc->GetMcsFromCqi(Cqi);
+                //   int PRB = 20;
+                //   //int TBS = m_amc->GetDlTbSizeFromMcs(mcs,PRB);
+                //   //std::cout<<"mcs: " << (uint16_t)mcs << " Prb: " << (uint16_t)PRB << " Tbs: " << TBS <<std::endl;
+                //   std::cout << "Random Cqi: " << (uint16_t)Cqi << std::endl;
+                //   for(auto it=tbbytes.begin();it!=tbbytes.end();it++){
+                //     PRB = m_amc->GetPrbFromMcsTbs(mcs,(*it)*8);
+                //     std::cout << "Cqi-Mcs: " << (uint16_t)mcs << " Cqi-PRB: " << (uint16_t)PRB << " Cqi-TBS: " << (*it)*8 << std::endl;
+                //   }
+                //   double sinr = -2.0 + static_cast <float> (std::rand()) / ( static_cast <float> (RAND_MAX/(20.0-(-2.0))));
+                //   std::cout << "SINR: " <<sinr<<std::endl;
+                //   DoubleValue ber;
+                //   m_amc->GetAttribute("Ber",ber);
+                //   double ber_ = ber.Get();
+                //   double s = log2 ( 1 + ( sinr / ( (-std::log (5.0 * (ber_))) / 1.5) ));
+                //   int CqiSinr = m_amc->GetCqiFromSpectralEfficiency(s);
+                //   std::cout << "CqiSinr: " << CqiSinr <<std::endl;
+                //   mcs = m_amc->GetMcsFromCqi(CqiSinr);
+                //   for(auto it=tbbytes.begin();it!=tbbytes.end();it++){
+                //     PRB = m_amc->GetPrbFromMcsTbs(mcs,(*it)*8);
+                //     std::cout << "Sinr-Mcs: " << (uint16_t)mcs << " Sinr-PRB: " << (uint16_t)PRB << " Sinr-TBS: " << (*it)*8 << std::endl;
+                //   }
                   
-                  NS_LOG_DEBUG ("kPairIndex= " << kPairIndex << ", <MCS, PRBs>= <" << (uint16_t)grant.m_mcs << ", " << (uint16_t)grant.m_rbLen << ">, TBS= " << grant.m_tbSize);
-                  break;  
-                }
+                //   NS_LOG_DEBUG ("kPairIndex= " << kPairIndex << ", <MCS, PRBs>= <" << (uint16_t)grant.m_mcs << ", " << (uint16_t)grant.m_rbLen << ">, TBS= " << grant.m_tbSize);
+                //   break;  
+                // }
                 case LteUeMac::SlSchedulingGrantMetric::MAX_COVERAGE:
                   NS_LOG_INFO ("PSSCH MAX_COVERAGE grant scheduling");
                   //Find pair with lowest score
@@ -2700,11 +2710,14 @@ LteUeMac::GetPoolForDestination (uint32_t dstL2Id)
   return itPool;
 }
 
-Ptr<SidelinkTxCommResourcePool>
-LteUeMac::GetslTxpool()
-{
-	 NS_LOG_FUNCTION (this);
-	 std::cout << "size of" <<  m_sidelinkTxPools.size() << std::endl;
-	 return m_sidelinkTxPools.front().m_pool;
-}
+//Lokesh
+
+// Ptr<SidelinkTxCommResourcePool>
+// LteUeMac::GetslTxpool()
+// {
+// 	 NS_LOG_FUNCTION (this);
+// 	 std::cout << "size of" <<  m_sidelinkTxPools.size() << std::endl;
+// 	 return m_sidelinkTxPools.front().m_pool;
+// }
+
 } // namespace ns3
